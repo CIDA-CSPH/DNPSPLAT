@@ -42,8 +42,50 @@ Rscript app.R
 - **powerUI.R**: Statistical power and sample size calculations
 - **descriptive modules**: Various descriptive statistics tools
 
+## Testing Framework
+- **Comprehensive Testing Suite**: Located in `tests/` directory with organized subdirectories
+- **Resilient Testing**: Crash recovery, session management, and persistent logging
+- **Quick Start**: `source("tests/utilities/test_orchestrator.R")` then `run_resilient_test_suite()`
+- **Key Testing Files**:
+  - `tests/utilities/test_orchestrator.R`: Main testing coordinator with crash recovery
+  - `tests/data/toy_datasets.R`: Standardized test datasets for all statistical modules
+  - `tests/config/test_config.yml`: Configuration file for testing behavior
+  - `tests/README.md`: Complete testing documentation
+- **Testing Approach**: Uses preloaded toy datasets (ToothGrowth, sleep, mtcars, etc.) instead of manual data entry
+- **Module Coverage**: Tests 11 core modules with multiple input methods (matrix, paste, file upload)
+- **Crash Recovery**: Automatic checkpointing allows resuming interrupted test sessions
+- **Logging**: Multi-level logging (DEBUG, INFO, WARN, ERROR) with log rotation
+- **Reporting**: Generates HTML, text, and CSV reports with comprehensive results
+
+## Recent Bug Fixes and Issues
+
+### McNemar's Test Input Validation (RESOLVED)
+**Issue**: Users reported "nonnegative and finite" error when entering 2x2 contingency table data  
+**Root Cause**: Users entering marginal totals instead of paired observations, sometimes with negative calculations  
+**Solution Applied**:
+- **R/mcnemarsUI.R:769-778**: Added comprehensive input validation
+  - Validates non-negative values with educational error message
+  - Checks for finite numbers and whole number counts
+- **R/mcnemarsUI.R:32-61**: Enhanced user instructions with visual guide
+  - Added prominent info box explaining paired observations requirement
+  - Visual 2×2 matrix format with cell-by-cell explanation
+- **R/mcnemarsUI.R:139-147**: Added example explanation next to matrix input
+  - Explains what each cell in the default example represents
+
+**Testing**: Validated with `test_mcnemars_fixes.R` - all validation scenarios pass correctly
+
+### UI Testing Infrastructure
+**Chrome/shinytest2 Setup**: 
+- Created `tests/ui/chrome_config.R` with NOT_CRAN=true environment variable
+- Chrome path auto-detection for Windows systems
+- **Authentication**: Removed from `app.R` (lines 91-126, 481-485) for easier testing
+
 ## Development Notes
 - All UI modules follow the pattern: `[name]UI <- function(id) { ns <- NS(id); ... }`
 - The app uses `shinyApp(ui = ui, server = server, enableBookmarking = "url")` for state persistence
 - Static files in `www/` include educational materials, templates, and multimedia content
-- No traditional testing framework detected - application appears to be manually tested
+- **Testing Strategy**: Use the resilient testing framework to identify broken functionality systematically
+- **Production Issues**: App is deployed on shinyapps.io but experiencing failures - use testing suite for diagnosis
+- **File Management**: Testing framework includes automated cleanup and archival of test results
+- Do not search files in the www folder
+- **McNemar's Module**: Now includes robust input validation and enhanced user guidance

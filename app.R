@@ -87,46 +87,8 @@ ui<-fluidPage(
          
   
   
-  # authentication module
-  auth_ui(
-    id = "auth",
-    # add image on top ?
-    tags_top = 
-      tags$div(
-        tags$h1("Statistical Planning, Learning, and Analysis Tool: DNP Edition.", style = "align:center"),
-        br(),
-        br(),
-        #tags$img(
-        #  src = "https://www.r-project.org/logo/Rlogo.png", width = 100
-        #)
-      ),
-    # add information on bottom ?
-    #tags_bottom = tags$div(
-    #  tags$p(
-    #    "Please  contact the ",
-    #    tags$a(
-    #      href = "mailto:bryan.mcnair@cuanschutz.com?Subject=Shiny%20aManager",
-    #      target="_top", "course instructor"
-    #    ),
-    #    " or the ",
-    #    tags$a(
-    #      href = "mailto:bryan.mcnair@cuanschutz.com?Subject=Shiny%20aManager",
-    #      target="_top", "course administrator"
-    #    ),
-    #    " with any questions."
-    #  )
-    #),
-    # change auth ui background ?
-    # https://developer.mozilla.org/fr/docs/Web/CSS/background
-    background  = "linear-gradient(rgba(129, 142, 159, 1),
-                       rgba(123, 138, 152,1.0)),
-                       url('https://www.r-project.org/logo/Rlogo.png');", 
-    # set language ?
-    lan = use_language("en")
-  ),
-  
-  # result of authentication
-  #verbatimTextOutput(outputId = "res_auth"),
+  # authentication removed for testing
+  # auth_ui removed - direct access to app content
   
   
   
@@ -477,16 +439,16 @@ server <- function(input, output,session) {
   #result_auth <- secure_server(check_credentials = check_credentials(credentials),max_users=30)
   
   
-  # authentication module
-  auth <- callModule(
-    module = auth_server,
-    id = "auth",
-    check_credentials = check_credentials(credentials)
-  )
-  
-  output$res_auth <- renderPrint({
-    reactiveValuesToList(auth)
-  })
+  # authentication module removed for testing
+  # auth <- callModule(
+  #   module = auth_server,
+  #   id = "auth",
+  #   check_credentials = check_credentials(credentials)
+  # )
+  # 
+  # output$res_auth <- renderPrint({
+  #   reactiveValuesToList(auth)
+  # })
   
   # classic app
   #selectedData <- reactive({

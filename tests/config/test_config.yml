@@ -1,0 +1,294 @@
+# DNPSPLAT Test Configuration
+# This file contains all configuration settings for the testing suite
+
+# General Test Settings
+test_suite:
+  name: "DNPSPLAT_Testing_Suite"
+  version: "1.0.0"
+  default_timeout_seconds: 300
+  retry_failed_tests: true
+  max_retries: 2
+  parallel_execution: false
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARN, ERROR
+  console_output: true
+  file_output: true
+  max_log_size_mb: 50
+  max_log_files: 10
+  log_rotation: true
+  timestamp_format: "%Y-%m-%d %H:%M:%S"
+  
+  # Log file locations (relative to tests/ directory)
+  files:
+    session: "logs/test_sessions.log"
+    module: "logs/module_details.log"
+    error: "logs/errors.log"
+    performance: "logs/performance.log"
+
+# Session Management
+session:
+  auto_save_state: true
+  save_interval_minutes: 5
+  enable_crash_recovery: true
+  max_session_history: 50
+  cleanup_old_sessions_days: 30
+  
+  # Checkpoint locations
+  checkpoints:
+    directory: "checkpoints"
+    session_state: "session_state.rds"
+    module_progress: "module_progress.json"
+    recovery_data: "recovery_data.rds"
+
+# Module Testing Configuration
+modules:
+  # Default modules to test (can be overridden)
+  default_test_list:
+    - "ciForMean"
+    - "ciForProportion" 
+    - "twoSampleTTest"
+    - "pairedTTest2"
+    - "contTable2"
+    - "mcnemars"
+    - "runChart2"
+    - "ttestPower"
+    - "wilcoxon1"
+    - "wilcoxon2"
+    - "descrStats"
+  
+  # Test type mappings for each module
+  test_mappings:
+    ciForMean:
+      - "one_sample_ttest"
+      - "two_sample_ttest"
+    ciForProportion:
+      - "ci_proportion"
+    twoSampleTTest:
+      - "two_sample_ttest"
+    pairedTTest2:
+      - "paired_ttest"
+    contTable2:
+      - "contingency_2x2"
+      - "contingency_larger"
+    mcnemars:
+      - "mcnemars"
+    runChart2:
+      - "run_chart"
+    ttestPower:
+      - "power_analysis"
+    wilcoxon1:
+      - "wilcoxon_paired"
+    wilcoxon2:
+      - "wilcoxon_two_sample"
+    descrStats:
+      - "descriptive_stats"
+
+# Data Testing Configuration
+data:
+  # Test data sources
+  toy_datasets_file: "data/toy_datasets.R"
+  excel_templates_dir: "data/excel_templates"
+  custom_datasets_dir: "data/custom_datasets"
+  
+  # Data validation settings
+  validation:
+    check_missing_values: true
+    check_data_types: true
+    check_outliers: true
+    outlier_threshold_sd: 3
+  
+  # Excel file settings
+  excel:
+    max_file_size_mb: 10
+    allowed_extensions: [".xlsx", ".xls"]
+    temp_file_cleanup: true
+
+# Statistical Testing Configuration
+statistics:
+  # Expected results validation
+  validation:
+    enabled: true
+    tolerance: 0.01
+    strict_mode: false  # If true, fails on any validation mismatch
+  
+  # Performance thresholds
+  performance:
+    max_calculation_time_seconds: 30
+    max_memory_usage_mb: 500
+    track_performance: true
+  
+  # Error handling
+  error_handling:
+    continue_on_module_failure: true
+    detailed_error_logging: true
+    save_partial_results: true
+
+# Reporting Configuration
+reporting:
+  # Output locations
+  output:
+    current_dir: "reports/current"
+    history_dir: "reports/history"
+    templates_dir: "reports/templates"
+  
+  # Report types to generate
+  generate:
+    html: true
+    text: true 
+    csv: true
+    json: false
+  
+  # Report content settings
+  content:
+    include_raw_data: false
+    include_plots: true
+    include_performance_metrics: true
+    include_error_details: true
+    max_error_details: 100
+  
+  # Archival settings
+  archive:
+    enabled: true
+    retention_days: 90
+    compress_old_reports: true
+
+# Environment Settings
+environment:
+  # Local development settings
+  local:
+    r_executable: "C:/Program Files/R/R-4.4.3/bin/R.exe"
+    rscript_executable: "C:/Program Files/R/R-4.4.3/bin/Rscript.exe"
+    working_directory: ""  # Empty means current directory
+    temp_directory: ""     # Empty means system temp
+  
+  # Production/deployment settings
+  production:
+    shinyapps_url: ""
+    timeout_seconds: 600
+    memory_limit_mb: 1024
+    compare_with_local: true
+
+# File Management
+file_management:
+  # Cleanup settings
+  cleanup:
+    auto_cleanup: true
+    temp_files_max_age_hours: 24
+    log_files_max_age_days: 30
+    report_files_max_age_days: 90
+  
+  # Backup settings
+  backup:
+    enabled: true
+    backup_before_cleanup: true
+    backup_location: "backups"
+    max_backups: 10
+
+# Advanced Settings
+advanced:
+  # Memory management
+  memory:
+    gc_after_module: true
+    memory_monitoring: true
+    memory_limit_warning_mb: 1000
+  
+  # Debugging
+  debug:
+    verbose_output: false
+    save_debug_info: false
+    debug_log_file: "logs/debug.log"
+  
+  # Experimental features
+  experimental:
+    parallel_module_testing: false
+    incremental_reporting: false
+    real_time_monitoring: false
+
+# UI Testing Configuration (shinytest2)
+ui_testing:
+  # General UI test settings
+  enabled: true
+  headless: true
+  browser: "chrome"
+  timeout_ms: 30000
+  
+  # App configuration for testing
+  app:
+    host: "127.0.0.1"
+    port: null  # null = random port
+    app_dir: "."
+    height: 900
+    width: 1400
+    
+  # Screenshot settings
+  screenshots:
+    enabled: true
+    directory: "screenshots"
+    on_failure: true
+    on_success: false
+    comparison_enabled: true
+    comparison_threshold: 5  # pixels
+    
+  # Testing behavior
+  behavior:
+    wait_for_idle_ms: 2000
+    navigation_timeout_ms: 10000
+    element_timeout_ms: 5000
+    retry_attempts: 3
+    
+  # Module testing settings
+  modules:
+    test_all_input_methods: true
+    input_methods:
+      - "matrix_input"
+      - "paste_input"
+      - "file_upload"
+      - "manual_entry"
+    
+    # Navigation strategies (tried in order)
+    navigation_strategies:
+      - "direct_link"    # a[data-value='module']
+      - "menu_click"     # click analyze menu first
+      - "text_match"     # find by text content
+      
+  # Error detection
+  error_detection:
+    check_shiny_errors: true
+    check_console_errors: true
+    check_network_errors: false
+    error_selectors:
+      - ".shiny-output-error"
+      - ".shiny-output-error-validation" 
+      - ".error"
+      
+  # Specific tests
+  specific_tests:
+    mcnemars:
+      enabled: true
+      test_problematic_data: true
+      data_matrix:
+        - [3, 22]
+        - [21, 2]
+      expected_error_pattern: "nonnegative and finite"
+      test_tabs:
+        - "Example Data"
+        - "Paste Data" 
+        - "Manual Entry"
+        
+    all_modules:
+      enabled: true
+      quick_test: true  # Just navigation and basic interaction
+      
+  # Performance monitoring
+  performance:
+    track_load_times: true
+    track_interaction_times: true
+    max_test_duration_minutes: 10
+    
+  # Cleanup
+  cleanup:
+    remove_screenshots_on_success: false
+    cleanup_temp_files: true
+    max_screenshot_age_days: 7

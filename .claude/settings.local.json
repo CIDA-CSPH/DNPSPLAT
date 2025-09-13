@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"C:\\Program Files\\R\\R-4.4.3\\bin\\Rscript.exe\" -e \"source(''tests/ui/chrome_config.R'')\")",
+      "Bash(\"C:\\Program Files\\R\\R-4.4.3\\bin\\Rscript.exe\" -e \"\noptions(repos = c(CRAN = ''https://cloud.r-project.org/''))\ncat(''=== TESTING ENHANCED CHROME CONFIGURATION ===\\n'')\nsource(''tests/ui/chrome_config.R'')\n\")",
+      "WebSearch",
+      "Bash(\"C:\\Program Files\\R\\R-4.4.3\\bin\\Rscript.exe\" -e \"\noptions(repos = c(CRAN = ''https://cloud.r-project.org/''))\ncat(''=== RUNNING FULL COMPREHENSIVE TEST SUITE ===\\n'')\ncat(''With Chrome CRAN bypass fix applied\\n\\n'')\nsource(''tests/master_test.R'')\n\")",
+      "Bash(\"C:\\Program Files\\R\\R-4.4.3\\bin\\Rscript.exe\" tests/master_test.R)",
+      "Bash(\"C:\\Program Files\\R\\R-4.4.3\\bin\\Rscript.exe\" tests/unit/test-mcnemars-backend.R)",
+      "Bash(\"C:\\Program Files\\R\\R-4.4.3\\bin\\Rscript.exe\" test_navigation.R)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

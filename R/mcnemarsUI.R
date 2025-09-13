@@ -30,7 +30,33 @@ mcnemarsUI <- function(id) {
            br(),
            br(),
            column(12,
+                  strong("McNemar's Test for Paired Data"),
+                  br(),
+                  br(),
                   "The null hypothesis for McNemar's test is called marginal homogeneity. Unlike our t-test tools, our McNemar's test tool does not allow you to adjust the null hypothesis.",
+                  br(),
+                  br(),
+                  div(style="background-color: #e8f4f8; padding: 10px; border-radius: 5px; border-left: 4px solid #17a2b8;",
+                      strong("IMPORTANT - Data Entry Format:"),
+                      br(),
+                      "McNemar's test requires a 2×2 table of ", strong("paired observations"), ", NOT marginal totals.",
+                      br(),
+                      br(),
+                      "Your 2×2 matrix should show:",
+                      br(),
+                      div(style="font-family: monospace; margin: 10px;",
+                          "                Post-Yes  Post-No", br(),
+                          "Pre-Yes     |    a    |    b    |", br(),
+                          "Pre-No      |    c    |    d    |", br()
+                      ),
+                      "Where:", br(),
+                      "• a = people who were Yes both before AND after", br(),
+                      "• b = people who were Yes before but No after", br(), 
+                      "• c = people who were No before but Yes after", br(),
+                      "• d = people who were No both before AND after", br(),
+                      br(),
+                      strong("All entries must be non-negative whole numbers.")
+                  ),
                   br(),
                   br()
            ),
@@ -110,7 +136,16 @@ mcnemarsUI <- function(id) {
                                                                                             #cells = list(editableCells = FALSE)
                                                                                             )
                                                                                           ),
-                                                column(6,br()),
+                                                column(6,
+                                                      div(style="color: #6c757d; font-size: 0.9em; margin-top: 10px;",
+                                                          icon("info-circle"), 
+                                                          strong(" Example explanation:"), br(),
+                                                          "• Top-left (22): Had disease both before AND after", br(),
+                                                          "• Top-right (2): Had disease before, NOT after", br(),
+                                                          "• Bottom-left (10): NO disease before, HAD disease after", br(),
+                                                          "• Bottom-right (6): NO disease both before AND after"
+                                                      )
+                                                ),
                                                                                   
                                                 br(),
                                       
@@ -766,6 +801,17 @@ mcnemarsServer <- function(id) {
         if(input$dataInput==4){
           matrix1a<-input$matrix1a4
         }
+        # Validate matrix entries before McNemar's test
+        if (any(matrix1a < 0)) {
+          stop("Error: All matrix entries must be non-negative. McNemar's test requires counts of paired observations, not differences or negative values.")
+        }
+        if (any(!is.finite(matrix1a))) {
+          stop("Error: All matrix entries must be finite numbers.")
+        }
+        if (any(matrix1a != round(matrix1a))) {
+          stop("Error: All matrix entries must be whole numbers (counts of observations).")
+        }
+        
         test <- mcnemar.test(matrix1a)
         test$p.value
       })
