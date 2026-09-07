@@ -1,0 +1,450 @@
+---
+title: "Help! Which statistical test should I use?"
+subtitle: "A guide to empower your inner statistician"
+author: "Marcus Waldman"
+date: today
+format:
+  html:
+    toc: true
+    toc-location: body
+    toc-depth: 3
+    theme: cosmo
+    code-fold: true
+    embed-resources: true
+    page-layout: full
+    grid:
+      body-width: 1400px
+      sidebar-width: 0px
+      margin-width: 0px
+  pdf:
+    toc: true
+    documentclass: article
+    geometry: margin=1in
+execute:
+  enabled: false
+---
+
+<style>
+/* Color coding for test names - colorblind-friendly palette */
+.test-2sample-t {
+  background-color: #B3D9FF;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #0173B2;
+  font-weight: 600;
+}
+
+.test-paired-t {
+  background-color: #E6F2FF;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #0173B2;
+  font-weight: 600;
+}
+
+.test-wilcox-rank {
+  background-color: #FFE5B3;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #DE8F05;
+  font-weight: 600;
+}
+
+.test-wilcox-signed {
+  background-color: #FFF2D9;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #DE8F05;
+  font-weight: 600;
+}
+
+.test-chisq {
+  background-color: #B3E6D9;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #029E73;
+  font-weight: 600;
+}
+
+.test-fisher {
+  background-color: #D9F2EB;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #029E73;
+  font-weight: 600;
+}
+
+.test-mcnemar {
+  background-color: #99D6C3;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #029E73;
+  font-weight: 600;
+}
+
+/* Interpreting for Practice color coding - colorblind-friendly */
+.interpret-sign {
+  color: #0173B2;
+  font-weight: 600;
+}
+
+.interpret-size {
+  color: #DE8F05;
+  font-weight: 600;
+}
+
+.interpret-significance {
+  color: #029E73;
+  font-weight: 600;
+}
+</style>
+
+## Quick Reference Card
+
+### Key Questions to Ask
+
+1. **What is my [outcome variable](https://www.ncbi.nlm.nih.gov/books/NBK557882/)?**
+   - Continuous (measured on a scale) → T-tests or Wilcoxon tests
+   - Categorical (groups/categories) → Chi-squared, Fisher's, or McNemar's
+
+2. **Are my observations independent or paired?**
+   - Independent: Different subjects in each group
+   - Paired: Same subjects measured twice, or matched pairs
+
+3. **For continuous data: Is it normally distributed?**
+   - Check with [histogram, Q-Q plot, or box plot](https://statisticsbyjim.com/basics/assessing-normality-histograms-probability-plots/)
+   - If n > 30, [t-tests]{.test-2sample-t} are generally robust to non-normality
+
+4. **For categorical data: Do any cells have fewer than 5 observations?**
+   - Look at the smallest count in your [contingency table](https://en.wikipedia.org/wiki/Contingency_table)
+   - If any cell < 5, use [Fisher's exact test]{.test-fisher}
+
+### Common Mistakes to Avoid
+
+- Using [Chi-squared]{.test-chisq} when any cell has fewer than 5 observations
+- Using [t-tests]{.test-2sample-t} on highly skewed data with small samples
+- Treating paired data as independent (or vice versa)
+- Using [McNemar's test]{.test-mcnemar} on unpaired categorical data
+
+## Decision Matrix
+
+::: {.callout-note}
+**Color Key:** Tests are color-coded by family (colorblind-friendly palette)
+
+- **Blue shades**: T-tests (parametric, continuous data)
+- **Orange shades**: Wilcoxon tests (non-parametric, continuous/ordinal data)
+- **Green shades**: Contingency table tests (categorical data)
+:::
+
+| Outcome Type | Groups | Distribution/Size | Recommended Test |
+|:-------------|:-------|:------------------|:-----------------|
+| Continuous | Independent | Normal | [**2-Sample T-Test**](#sample-t-test-independent-samples){.test-2sample-t} ([Helpful video](https://www.khanacademy.org/math/ap-statistics/xfb5d8e68:inference-quantitative-means/two-sample-t-test-means/v/two-sample-t-test-for-difference-of-means)) |
+| Continuous | Independent | Non-normal/Skewed | [**Wilcoxon Rank-Sum Test**](#wilcoxon-rank-sum-test-mann-whitney-u){.test-wilcox-rank} ([Helpful video](https://www.youtube.com/watch?v=AM87jjnNt8U)) |
+| Continuous | Paired/Matched | Normal | [**Paired T-Test**](#paired-t-test){.test-paired-t} ([Helpful video](https://www.khanacademy.org/math/ap-statistics/xfb5d8e68:inference-quantitative-means/two-sample-t-test-means/v/example-of-hypotheses-for-paired-and-2-sample-t-tests)) |
+| Continuous | Paired/Matched | Non-normal/Skewed | [**Wilcoxon Signed-Rank Test**](#wilcoxon-signed-rank-test){.test-wilcox-signed} ([Helpful video](https://www.youtube.com/watch?v=4XdhxQ3THS0)) |
+| Categorical | Independent | Large sample (all cells ≥ 5) | [**Chi-Squared Test**](#chi-squared-test){.test-chisq} ([Helpful video](https://www.khanacademy.org/math/ap-statistics/chi-square-tests/chi-square-goodness-fit/v/chi-square-statistic)) |
+| Categorical | Independent | Small sample (any cell < 5) | [**Fisher's Exact Test**](#fishers-exact-test){.test-fisher} ([Helpful video](https://www.youtube.com/watch?v=W_wqly6Fr-o)) |
+| Categorical | Paired/Matched | Any | [**McNemar's Test**](#mcnemars-test){.test-mcnemar} ([Helpful video](https://www.youtube.com/watch?v=lbkdvDTXVQM)) |
+
+: Statistical Test Selection Matrix {#tbl-decision}
+
+::: {.callout-tip}
+## Key Terms Explained
+
+**Outcome Type:**
+
+- **Continuous:** Numbers that can take any value on a scale (e.g., blood pressure in mmHg, weight in kg, pain score 0-10, length of stay in days)
+- **Categorical:** Data that falls into distinct groups or categories (e.g., yes/no, pass/fail, infected/not infected, smoker/non-smoker)
+
+**Groups:**
+
+- **Independent:** Different people in each group. Example: 50 patients get Treatment A, a *different* 50 patients get Treatment B.
+- **Paired/Matched:** Same people measured twice, or intentionally matched pairs. Example: Measuring the *same* 50 patients before AND after an intervention.
+
+**Distribution (for continuous data):**
+
+- **Normal:** Data is roughly symmetric and bell-shaped. Most values cluster around the middle, with fewer extreme values. Common with large samples (n > 30).
+- **Non-normal/Skewed:** Data is lopsided—bunched up on one end with a long tail. Common with small samples, scores with floor/ceiling effects, or counts.
+
+**Cell counts (for categorical data):**
+
+When you have categorical data, you create a contingency table counting how many people fall into each combination:
+
+|                    | Outcome Yes | Outcome No |
+|--------------------|-------------|------------|
+| **Intervention**   | 8           | 42         |
+| **Control**        | 22          | 38         |
+
+- **All cells ≥ 5:** Every box in the table has 5 or more people → use Chi-Squared
+- **Any cell < 5:** At least one box has fewer than 5 people → use Fisher's Exact
+
+:::
+
+## Test Descriptions
+
+### Tests for Continuous Outcomes
+
+#### [2-Sample T-Test]{.test-2sample-t} (Independent Samples)
+
+**Use when:**
+
+- Comparing means between two independent groups
+- Outcome variable is continuous
+- Data is approximately normally distributed (or n > 30 per group)
+
+**Null hypothesis:** The population means of the two groups are equal.
+
+**Scenario:** Comparing systolic blood pressure (mmHg) between patients who received enhanced discharge education vs. standard care.
+
+| Patient | Group | Systolic BP (mmHg) |
+|---------|-------|--------------------|
+| 1       | Enhanced | 120 |
+| 2       | Enhanced | 135 |
+| 3       | Enhanced | 142 |
+| 4       | Standard | 110 |
+| 5       | Standard | 118 |
+| 6       | Standard | 125 |
+
+---
+
+#### [Paired T-Test]{.test-paired-t}
+
+**Use when:**
+
+- Comparing means between two related measurements
+- Same subjects measured twice (before/after)
+- Differences are approximately normally distributed
+
+**Null hypothesis:** The mean difference between paired observations is zero.
+
+**Scenario:** Measuring systolic blood pressure (mmHg) in the same patients before and 3 months after implementing a hypertension self-management program.
+
+| Patient | Pre (mmHg) | Post (mmHg) | Change |
+|---------|------------|-------------|--------|
+| 1       | 152        | 138         | -14    |
+| 2       | 168        | 155         | -13    |
+| 3       | 145        | 140         | -5     |
+| 4       | 159        | 148         | -11    |
+| 5       | 171        | 158         | -13    |
+
+---
+
+#### [Wilcoxon Rank-Sum Test]{.test-wilcox-rank} (Mann-Whitney U)
+
+**Use when:**
+
+- Comparing two independent groups
+- Outcome is continuous or ordinal
+- Data is not normally distributed or sample size is small
+
+**Null hypothesis:** The distributions of the two groups are equal.
+
+**Scenario:** Comparing patient satisfaction scores (1-10 scale) between units using bedside shift report vs. traditional nurse station handoff.
+
+| Patient | Handoff Type | Satisfaction (1-10) |
+|---------|--------------|---------------------|
+| 1       | Bedside     | 8 |
+| 2       | Bedside     | 9 |
+| 3       | Bedside     | 7 |
+| 4       | Traditional | 5 |
+| 5       | Traditional | 6 |
+| 6       | Traditional | 7 |
+
+---
+
+#### [Wilcoxon Signed-Rank Test]{.test-wilcox-signed}
+
+**Use when:**
+
+- Comparing two related measurements (same subjects measured twice)
+- Data is not normally distributed
+- Ordinal data or skewed differences
+
+**Null hypothesis:** The median difference between pairs is zero.
+
+**Scenario:** Measuring post-operative pain (0-10 NRS) in the same patients before and after implementing a guided imagery intervention.
+
+| Patient | Pre (0-10) | Post (0-10) | Change |
+|---------|------------|-------------|--------|
+| 1       | 7          | 4           | -3     |
+| 2       | 8          | 5           | -3     |
+| 3       | 6          | 4           | -2     |
+| 4       | 9          | 6           | -3     |
+| 5       | 8          | 5           | -3     |
+
+---
+
+### Tests for Categorical Outcomes
+
+#### [Chi-Squared Test]{.test-chisq}
+
+**Use when:**
+
+- Testing association between two categorical variables
+- All cells have 5 or more observations
+- Independent observations (different people in each cell)
+
+**Null hypothesis:** The two categorical variables are independent.
+
+**Scenario:** Comparing rates of hospital-acquired pressure injuries (HAPI) between units that implemented a new skin assessment bundle vs. units using standard care.
+
+|                    | HAPI Yes | HAPI No | Row Total |
+|--------------------|----------|---------|-----------|
+| **New Bundle**     | 12       | 88      | 100       |
+| **Standard Care**  | 28       | 72      | 100       |
+| **Column Total**   | 40       | 160     | 200       |
+
+---
+
+#### [Fisher's Exact Test]{.test-fisher}
+
+**Use when:**
+
+- Testing association between two categorical variables
+- Any cell has fewer than 5 observations
+- Small sample sizes
+
+**Null hypothesis:** The two categorical variables are independent.
+
+**Scenario:** Pilot study comparing CLABSI rates between ICU patients receiving a new central line maintenance bundle vs. standard protocol (small sample).
+
+|                  | CLABSI | No CLABSI | Row Total |
+|------------------|--------|-----------|-----------|
+| **New Bundle**   | 1      | 11        | 12        |
+| **Standard**     | 6      | 6         | 12        |
+| **Column Total** | 7      | 17        | 24        |
+
+**Rule of thumb:** If your smallest cell has fewer than 5 observations (here: 1), use Fisher's Exact Test instead of Chi-Squared.
+
+---
+
+#### [McNemar's Test]{.test-mcnemar}
+
+**Use when:**
+
+- Paired categorical data (2×2 table)
+- **Same subjects** measured at two time points
+- Testing whether change occurred in one direction more than the other
+
+**Null hypothesis:** The probability of changing from A to B equals the probability of changing from B to A.
+
+**Scenario:** Testing whether nurses' hand hygiene compliance changed after a QI intervention, with the same 100 nurses observed before and after.
+
+|                         | **After: Compliant** | **After: Non-compliant** | Row Total |
+|-------------------------|----------------------|--------------------------|-----------|
+| **Before: Compliant**   | 45 (stayed compliant)| 15 (became non-compliant)| 60        |
+| **Before: Non-compliant**| 25 (became compliant)| 15 (stayed non-compliant)| 40        |
+| **Column Total**        | 70                   | 30                       | 100       |
+
+**Key Difference from [Chi-Squared]{.test-chisq}:**
+
+- **[Chi-Squared]{.test-chisq}/[Fisher's]{.test-fisher}:** 100 different people
+- **[McNemar's]{.test-mcnemar}:** Same 100 nurses observed twice
+- **Focus cells:** Only the **off-diagonal** cells matter (15 got worse vs. 25 improved)
+
+---
+
+## Interpreting for Practice
+
+When reporting statistical results for your DNP project, use the **3 S's** mnemonic to ensure you communicate findings clearly and meaningfully:
+
+::: {.callout-important}
+## The 3 S's: Sign, Size, Significance
+
+1. **[Sign]{.interpret-sign}** — What is the *direction* of the effect? (increase/decrease, higher/lower, more/less)
+2. **[Size]{.interpret-size}** — What is the *magnitude* of the effect? (How much did it change? Is it clinically meaningful?)
+3. **[Significance]{.interpret-significance}** — What does the *p-value* tell us? ([Do we have sufficient evidence to rule out sampling variability?](https://www.youtube.com/watch?v=EYX-QDNvlt4))
+:::
+
+Always report results in this order. The effect size (magnitude) is often more important for practice decisions than the p-value alone.
+
+---
+
+### Example 1: Paired T-Test for Blood Pressure
+
+**Result (APA 7):** A paired-samples *t*-test indicated that systolic blood pressure was lower after the self-management program (*M* = 148 mmHg, *SE* = 3.2) than before (*M* = 159 mmHg, *SE* = 4.1), *t*(24) = 3.44, *p* = .002, 95% CI [4.2, 17.8].
+
+**Interpretation:**
+
+"Following the self-management program, patients' systolic blood pressure [decreased]{.interpret-sign} by an average of 11 mmHg. [This reduction is clinically meaningful because a 10 mmHg decrease in systolic BP is associated with approximately 20% reduced risk of major cardiovascular events.]{.interpret-size} [Given p = .002 and the 95% CI [4.2, 17.8] excludes zero, there is sufficient evidence to rule out sampling variability.]{.interpret-significance}"
+
+**Why this works:**
+- [**Sign:**]{.interpret-sign} "decreased" clearly indicates direction
+- [**Size:**]{.interpret-size} Quantifies the change (11 mmHg) AND argues for clinical meaningfulness
+- [**Significance:**]{.interpret-significance} Uses p-value and CI to address whether we can rule out chance
+
+---
+
+### Example 2: Chi-Squared Test for Pressure Injuries
+
+**Result (APA 7):** A chi-square test of independence showed an association between the skin assessment bundle and HAPI occurrence, χ²(1, *N* = 200) = 8.2, *p* = .004. HAPI rates were 12% with the new bundle versus 28% with standard care.
+
+**Interpretation:**
+
+"Hospital-acquired pressure injury rates were [lower]{.interpret-sign} in units using the new bundle (12%) compared to standard care (28%)—a 16 percentage point absolute reduction. [This reduction is clinically meaningful because each HAPI is associated with extended hospital stays, increased costs (~$10,000–$25,000 per event), and significant patient suffering.]{.interpret-size} [Given χ²(1) = 8.2, p = .004, there is sufficient evidence to rule out sampling variability.]{.interpret-significance}"
+
+**Why this works:**
+- [**Sign:**]{.interpret-sign} "lower" indicates the favorable direction
+- [**Size:**]{.interpret-size} Both percentages (12% vs 28%) quantify magnitude AND the argument connects to patient outcomes and costs
+- [**Significance:**]{.interpret-significance} Uses p-value to address whether we can rule out chance
+
+---
+
+### Example 3: Results Without Sufficient Evidence
+
+**Result (APA 7):** A Wilcoxon signed-rank test indicated that pain scores after guided imagery (Mdn = 6) were not statistically different from pain scores before (Mdn = 7), *Z* = -1.55, *p* = .121.
+
+**Interpretation:**
+
+"Pain scores [decreased]{.interpret-sign} by a median of 1 point on the 0-10 NRS following guided imagery. [A 1-point reduction, while potentially noticeable to patients, falls below the 2-point threshold often considered the minimal clinically important difference for acute pain.]{.interpret-size} [However, with p = .121, there was insufficient evidence to rule out sampling variability.]{.interpret-significance}"
+
+**Why this works:**
+- [**Sign:**]{.interpret-sign} Still report the direction observed
+- [**Size:**]{.interpret-size} Reports the magnitude (1 point) AND discusses whether it meets clinical thresholds
+- [**Significance:**]{.interpret-significance} Honest about evidence limitations—p-value suggests we cannot rule out chance
+
+::: {.callout-tip}
+## Key Takeaway
+
+Never report p-values alone. Always include:
+- The direction of change
+- The magnitude with appropriate units and confidence intervals
+- A statement about clinical or practical meaningfulness
+
+**Marcus pet peeve:** Avoid saying results are "statistically significant" or "not significant." Instead, focus on what the data tell us about clinical importance.
+:::
+
+---
+
+## Statistical Software and Resources
+
+::: {.callout-note}
+## DNPSPLAT
+
+**DNPSPLAT** is a free, web-based statistical tool designed specifically for DNP students. It supports all seven tests covered in this guide.
+
+**Access:** <https://mystatshome.shinyapps.io/DNPSPLAT/>
+
+- **Username:** DNPAMC
+- **Password:** WeLuvStats4Life!
+:::
+
+::: {.callout-tip}
+## Using AI to Learn Statistical Tests (Without Compromising PHI)
+
+AI tools like Microsoft Copilot can help you learn how to run statistical tests—but **never enter real patient data**. Instead, ask the AI to generate a toy example with made-up data.
+
+**Example prompt:**
+
+> "I need to conduct a pairwise t-test in Microsoft Excel, but I need an example to follow, including how I structure my data. Give me a toy example so I can learn using made up data from 18 individuals taking the PHQ-9 before therapy and after 6 months of cognitive behavioral therapy."
+
+[See Copilot's response to this prompt](https://copilot.microsoft.com/shares/pttziuLuusCiaGmhhxdKT)
+
+This approach is:
+
+- **Safe** — No PHI is shared with AI tools
+- **Reproducible** — You follow each step manually and document what you did, creating an audit trail that a statistician or mentor can verify
+- **Educational** — You learn by working through a realistic example
+
+The AI is an *instructional resource*, not the analyst—you remain the analyst. This avoids the "black box" problem where data goes into an AI and results come out with no way to verify what happened in between.
+:::
