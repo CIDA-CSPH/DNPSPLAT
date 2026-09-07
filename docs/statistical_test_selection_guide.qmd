@@ -12,14 +12,11 @@ format:
     code-fold: true
     embed-resources: true
     page-layout: full
+    format-links: false
     grid:
       body-width: 1400px
       sidebar-width: 0px
       margin-width: 0px
-  pdf:
-    toc: true
-    documentclass: article
-    geometry: margin=1in
 execute:
   enabled: false
 ---
@@ -103,19 +100,20 @@ execute:
 
 ### Key Questions to Ask
 
-1. **What is my [outcome variable](https://www.ncbi.nlm.nih.gov/books/NBK557882/)?**
-   - Continuous (measured on a scale) → T-tests or Wilcoxon tests
-   - Categorical (groups/categories) → Chi-squared, Fisher's, or McNemar's
+1. **What is the [level of measurement](#levels-of-measurement) of my [outcome variable](https://www.ncbi.nlm.nih.gov/books/NBK557882/)?**
+   - **Interval or ratio** (measured on a scale) → T-tests or Wilcoxon tests
+   - **Ordinal with many levels** (e.g., pain 0–10) → Wilcoxon tests
+   - **Nominal, or ordinal with few categories** (groups) → Chi-squared, Fisher's, or McNemar's
 
 2. **Are my observations independent or paired?**
    - Independent: Different subjects in each group
    - Paired: Same subjects measured twice, or matched pairs
 
-3. **For continuous data: Is it normally distributed?**
+3. **For interval or ratio outcomes: Is the data normally distributed?**
    - Check with [histogram, Q-Q plot, or box plot](https://statisticsbyjim.com/basics/assessing-normality-histograms-probability-plots/)
    - If n > 30, [t-tests]{.test-2sample-t} are generally robust to non-normality
 
-4. **For categorical data: Do any cells have fewer than 5 observations?**
+4. **For nominal or ordinal outcomes: Do any cells have fewer than 5 observations?**
    - Look at the smallest count in your [contingency table](https://en.wikipedia.org/wiki/Contingency_table)
    - If any cell < 5, use [Fisher's exact test]{.test-fisher}
 
@@ -124,51 +122,122 @@ execute:
 - Using [Chi-squared]{.test-chisq} when any cell has fewer than 5 observations
 - Using [t-tests]{.test-2sample-t} on highly skewed data with small samples
 - Treating paired data as independent (or vice versa)
-- Using [McNemar's test]{.test-mcnemar} on unpaired categorical data
+- Using [McNemar's test]{.test-mcnemar} on unpaired nominal/ordinal data
+- Treating an ordinal outcome (a single Likert item, a stage, a risk category) as if it were interval or ratio — averaging it without asking whether the spacing between values is really equal
+
+## Levels of Measurement
+
+Before you can pick a test, you have to name what *kind* of variable your outcome is. The standard vocabulary — the one used in your statistics coursework, by your DNP committee, and in most nursing journals — is the four **levels of measurement**: **nominal**, **ordinal**, **interval**, and **ratio**. The level tells you what your numbers actually *mean*, and therefore what arithmetic is honest to do with them.
+
+Each level adds one property to the level before it:
+
+| Level | Categories are... | Ordered? | Equal spacing between values? | True zero (zero means "none")? |
+|:------|:------------------|:---------|:------------------------------|:-------------------------------|
+| **Nominal** | Named labels only | No | No | No |
+| **Ordinal** | Ranked labels | Yes | No | No |
+| **Interval** | Numbers | Yes | Yes | No |
+| **Ratio** | Numbers | Yes | Yes | Yes |
+
+: The four levels of measurement {#tbl-levels}
+
+### Nominal
+
+Unordered labels. The categories differ in *kind*, not in *amount*. There is no meaningful way to rank them, so averages are meaningless — only counts and percentages.
+
+**DNP examples:** unit assignment (ICU / med-surg / ED), central line infection (yes / no), insurance type (Medicare / Medicaid / commercial / self-pay), discharge disposition (home / SNF / rehab / expired), nurse licensure (RN / LPN).
+
+> A quick check: if you shuffled the order of the categories on a chart and nothing was lost, the variable is nominal.
+
+### Ordinal
+
+Ordered categories, but the distance between adjacent categories is unknown and probably unequal. You can say *more* or *less*, but not *how much more*. Medians and ranks are appropriate; means are shaky.
+
+**DNP examples:** pain rating 0–10, Likert satisfaction (strongly disagree → strongly agree), pressure injury stage (I / II / III / IV), Braden risk category (severe / high / moderate / mild), NYHA heart failure class (I–IV), triage acuity (ESI 1–5).
+
+> The gap between pressure injury stage I and II is not the same clinical distance as the gap between stage III and IV — even though the labels are one number apart. That is what makes it ordinal rather than interval.
+
+### Interval
+
+Equal, meaningful distances between values, but the zero point is arbitrary rather than an absence of the thing. Differences are interpretable; ratios are not.
+
+**DNP examples:** temperature in °F or °C, calendar year, standardized test scores with an arbitrary origin.
+
+> 40 °C is not "twice as hot" as 20 °C, because 0 °C does not mean "no temperature." Differences still work fine: a 2-degree rise is a 2-degree rise anywhere on the scale.
+
+### Ratio
+
+Everything interval has, plus a true zero meaning "none of it." Differences *and* ratios are both interpretable — this is the most informative level.
+
+**DNP examples:** length of stay in days, weight in kg, systolic blood pressure in mmHg, hemoglobin A1c, minutes to first ambulation, falls per 1,000 patient-days, number of readmissions.
+
+> A 10-day stay really is twice as long as a 5-day stay, because 0 days means no stay at all.
+
+### From Level of Measurement to Test
+
+For the seven tests in this guide, **interval and ratio behave identically** — that distinction matters for how you *describe* your results, not for which test you run. What actually drives test selection is whether your outcome can be meaningfully averaged or ranked, versus counted up in a table:
+
+- **Interval or ratio** → compare **means** with a [t-test]{.test-2sample-t}, or **ranks** with a [Wilcoxon]{.test-wilcox-rank} test if the data are skewed.
+- **Ordinal with many ordered levels** (e.g., pain 0–10, a summed Likert scale) → compare **ranks** with a [Wilcoxon]{.test-wilcox-rank} test.
+- **Nominal, or ordinal with only a few categories** → **count** people in a contingency table and use [Chi-Squared]{.test-chisq}, [Fisher's Exact]{.test-fisher}, or [McNemar's]{.test-mcnemar}.
+
+The [Decision Matrix](#decision-matrix) below carries this all the way to a specific test, once you add whether your groups are independent or paired.
+
+::: {.callout-warning}
+## Ordinal is the one that trips people up
+
+Ordinal is the only level that can go either way, and where it lands depends on how many levels it has.
+
+- **Few ordered categories** (e.g., "improved / unchanged / worsened") → count them in a contingency table and use [Chi-Squared]{.test-chisq}, [Fisher's Exact]{.test-fisher}, or [McNemar's]{.test-mcnemar}.
+- **Many ordered levels** (e.g., a 0–10 pain scale, a summed Likert scale) → the [Wilcoxon]{.test-wilcox-rank} tests are the safe default. They work on **ranks**, which is exactly what ordinal data supports, so they do not require you to pretend the spacing between values is equal.
+
+Running a t-test on an ordinal outcome is a very common shortcut. It is defensible for a long, well-behaved scale with a large sample, but the rank-based Wilcoxon test is the more honest choice — and with the same data it usually reaches the same conclusion, so there is little to lose by using it.
+:::
 
 ## Decision Matrix
 
 ::: {.callout-note}
 **Color Key:** Tests are color-coded by family (colorblind-friendly palette)
 
-- **Blue shades**: T-tests (parametric, continuous data)
-- **Orange shades**: Wilcoxon tests (non-parametric, continuous/ordinal data)
-- **Green shades**: Contingency table tests (categorical data)
+- **Blue shades**: T-tests (parametric; interval or ratio outcomes)
+- **Orange shades**: Wilcoxon tests (non-parametric; interval, ratio, or many-level ordinal outcomes)
+- **Green shades**: Contingency table tests (nominal outcomes, or ordinal with few categories)
 :::
 
-| Outcome Type | Groups | Distribution/Size | Recommended Test |
-|:-------------|:-------|:------------------|:-----------------|
-| Continuous | Independent | Normal | [**2-Sample T-Test**](#sample-t-test-independent-samples){.test-2sample-t} ([Helpful video](https://www.khanacademy.org/math/ap-statistics/xfb5d8e68:inference-quantitative-means/two-sample-t-test-means/v/two-sample-t-test-for-difference-of-means)) |
-| Continuous | Independent | Non-normal/Skewed | [**Wilcoxon Rank-Sum Test**](#wilcoxon-rank-sum-test-mann-whitney-u){.test-wilcox-rank} ([Helpful video](https://www.youtube.com/watch?v=AM87jjnNt8U)) |
-| Continuous | Paired/Matched | Normal | [**Paired T-Test**](#paired-t-test){.test-paired-t} ([Helpful video](https://www.khanacademy.org/math/ap-statistics/xfb5d8e68:inference-quantitative-means/two-sample-t-test-means/v/example-of-hypotheses-for-paired-and-2-sample-t-tests)) |
-| Continuous | Paired/Matched | Non-normal/Skewed | [**Wilcoxon Signed-Rank Test**](#wilcoxon-signed-rank-test){.test-wilcox-signed} ([Helpful video](https://www.youtube.com/watch?v=4XdhxQ3THS0)) |
-| Categorical | Independent | Large sample (all cells ≥ 5) | [**Chi-Squared Test**](#chi-squared-test){.test-chisq} ([Helpful video](https://www.khanacademy.org/math/ap-statistics/chi-square-tests/chi-square-goodness-fit/v/chi-square-statistic)) |
-| Categorical | Independent | Small sample (any cell < 5) | [**Fisher's Exact Test**](#fishers-exact-test){.test-fisher} ([Helpful video](https://www.youtube.com/watch?v=W_wqly6Fr-o)) |
-| Categorical | Paired/Matched | Any | [**McNemar's Test**](#mcnemars-test){.test-mcnemar} ([Helpful video](https://www.youtube.com/watch?v=lbkdvDTXVQM)) |
+| Level of Measurement | Groups | Distribution/Size | Recommended Test |
+|:---------------------|:-------|:------------------|:-----------------|
+| Interval / Ratio | Independent | Normal | [**2-Sample T-Test**](#sample-t-test-independent-samples){.test-2sample-t} ([Helpful video](https://www.khanacademy.org/math/ap-statistics/xfb5d8e68:inference-quantitative-means/two-sample-t-test-means/v/two-sample-t-test-for-difference-of-means)) |
+| Interval / Ratio, or Ordinal (many levels) | Independent | Non-normal/Skewed | [**Wilcoxon Rank-Sum Test**](#wilcoxon-rank-sum-test-mann-whitney-u){.test-wilcox-rank} ([Helpful video](https://www.youtube.com/watch?v=AM87jjnNt8U)) |
+| Interval / Ratio | Paired/Matched | Normal | [**Paired T-Test**](#paired-t-test){.test-paired-t} ([Helpful video](https://www.khanacademy.org/math/ap-statistics/xfb5d8e68:inference-quantitative-means/two-sample-t-test-means/v/example-of-hypotheses-for-paired-and-2-sample-t-tests)) |
+| Interval / Ratio, or Ordinal (many levels) | Paired/Matched | Non-normal/Skewed | [**Wilcoxon Signed-Rank Test**](#wilcoxon-signed-rank-test){.test-wilcox-signed} ([Helpful video](https://www.youtube.com/watch?v=4XdhxQ3THS0)) |
+| Nominal, or Ordinal (few categories) | Independent | Large sample (all cells ≥ 5) | [**Chi-Squared Test**](#chi-squared-test){.test-chisq} ([Helpful video](https://www.khanacademy.org/math/ap-statistics/chi-square-tests/chi-square-goodness-fit/v/chi-square-statistic)) |
+| Nominal, or Ordinal (few categories) | Independent | Small sample (any cell < 5) | [**Fisher's Exact Test**](#fishers-exact-test){.test-fisher} ([Helpful video](https://www.youtube.com/watch?v=W_wqly6Fr-o)) |
+| Nominal, or Ordinal (few categories) | Paired/Matched | Any | [**McNemar's Test**](#mcnemars-test){.test-mcnemar} ([Helpful video](https://www.youtube.com/watch?v=lbkdvDTXVQM)) |
 
 : Statistical Test Selection Matrix {#tbl-decision}
 
 ::: {.callout-tip}
 ## Key Terms Explained
 
-**Outcome Type:**
+**Level of Measurement** (see [Levels of Measurement](#levels-of-measurement) for the full definitions and examples)**:**
 
-- **Continuous:** Numbers that can take any value on a scale (e.g., blood pressure in mmHg, weight in kg, pain score 0-10, length of stay in days)
-- **Categorical:** Data that falls into distinct groups or categories (e.g., yes/no, pass/fail, infected/not infected, smoker/non-smoker)
+- **Nominal:** Unordered labels (e.g., yes/no, pass/fail, infected/not infected, unit assignment).
+- **Ordinal:** Ordered categories with unequal spacing (e.g., pain 0–10, Likert satisfaction, pressure injury stage).
+- **Interval:** Equal spacing, but no true zero (e.g., temperature in °F).
+- **Ratio:** Equal spacing and a true zero (e.g., length of stay in days, weight in kg, mmHg).
 
 **Groups:**
 
 - **Independent:** Different people in each group. Example: 50 patients get Treatment A, a *different* 50 patients get Treatment B.
 - **Paired/Matched:** Same people measured twice, or intentionally matched pairs. Example: Measuring the *same* 50 patients before AND after an intervention.
 
-**Distribution (for continuous data):**
+**Distribution (for interval, ratio, or many-level ordinal outcomes):**
 
 - **Normal:** Data is roughly symmetric and bell-shaped. Most values cluster around the middle, with fewer extreme values. Common with large samples (n > 30).
 - **Non-normal/Skewed:** Data is lopsided—bunched up on one end with a long tail. Common with small samples, scores with floor/ceiling effects, or counts.
 
-**Cell counts (for categorical data):**
+**Cell counts (for nominal or few-category ordinal outcomes):**
 
-When you have categorical data, you create a contingency table counting how many people fall into each combination:
+When your outcome is nominal (or ordinal with just a few categories), you create a contingency table counting how many people fall into each combination:
 
 |                    | Outcome Yes | Outcome No |
 |--------------------|-------------|------------|
@@ -182,14 +251,14 @@ When you have categorical data, you create a contingency table counting how many
 
 ## Test Descriptions
 
-### Tests for Continuous Outcomes
+### Tests for Interval, Ratio, or Many-Level Ordinal Outcomes
 
 #### [2-Sample T-Test]{.test-2sample-t} (Independent Samples)
 
 **Use when:**
 
 - Comparing means between two independent groups
-- Outcome variable is continuous
+- Outcome variable is interval or ratio
 - Data is approximately normally distributed (or n > 30 per group)
 
 **Null hypothesis:** The population means of the two groups are equal.
@@ -234,7 +303,7 @@ When you have categorical data, you create a contingency table counting how many
 **Use when:**
 
 - Comparing two independent groups
-- Outcome is continuous or ordinal
+- Outcome is interval, ratio, or ordinal
 - Data is not normally distributed or sample size is small
 
 **Null hypothesis:** The distributions of the two groups are equal.
@@ -274,17 +343,17 @@ When you have categorical data, you create a contingency table counting how many
 
 ---
 
-### Tests for Categorical Outcomes
+### Tests for Nominal or Few-Category Ordinal Outcomes
 
 #### [Chi-Squared Test]{.test-chisq}
 
 **Use when:**
 
-- Testing association between two categorical variables
+- Testing association between two nominal (or few-category ordinal) variables
 - All cells have 5 or more observations
 - Independent observations (different people in each cell)
 
-**Null hypothesis:** The two categorical variables are independent.
+**Null hypothesis:** The two variables are independent.
 
 **Scenario:** Comparing rates of hospital-acquired pressure injuries (HAPI) between units that implemented a new skin assessment bundle vs. units using standard care.
 
@@ -300,11 +369,11 @@ When you have categorical data, you create a contingency table counting how many
 
 **Use when:**
 
-- Testing association between two categorical variables
+- Testing association between two nominal (or few-category ordinal) variables
 - Any cell has fewer than 5 observations
 - Small sample sizes
 
-**Null hypothesis:** The two categorical variables are independent.
+**Null hypothesis:** The two variables are independent.
 
 **Scenario:** Pilot study comparing CLABSI rates between ICU patients receiving a new central line maintenance bundle vs. standard protocol (small sample).
 
@@ -322,7 +391,7 @@ When you have categorical data, you create a contingency table counting how many
 
 **Use when:**
 
-- Paired categorical data (2×2 table)
+- Paired nominal data (2×2 table)
 - **Same subjects** measured at two time points
 - Testing whether change occurred in one direction more than the other
 
